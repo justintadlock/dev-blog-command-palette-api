@@ -1,0 +1,11 @@
+{
+	"name": "dev-blog-command-palette-api",
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "wp-scripts build"
+	},
+	"dependencies": {
+		"@wordpress/icons": "^9.36.0",
+		"@wordpress/scripts": "^26.16.0"
+	}
+}

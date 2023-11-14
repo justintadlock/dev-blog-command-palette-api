@@ -27,20 +27,21 @@ dispatch( store ).registerCommand( {
 	}
 } );
 
-// Toggles Discussion panel in the post editor.
-// Is there a way to only show this command for the post editor?
-dispatch( store ).registerCommand( {
-	name:  'dev-blog/discussion-panel',
-	label: __( 'Toggle Discussion Panel', 'dev-blog' ),
-	icon:  comment,
-	context: 'post-editor', // Not an available context.
-	callback: ( { close } ) => {
-		dispatch( 'core/edit-post' ).toggleEditorPanelEnabled(
-			'discussion-panel'
-		);
-		close();
-	}
-} );
+// Toggles Discussion panel in the post editor. Checks if we're editing a post 
+// via `wp.editPost` before registering the command.
+if ( undefined !== wp.editPost ) {
+	dispatch( store ).registerCommand( {
+		name:  'dev-blog/discussion-panel',
+		label: __( 'Toggle Discussion Panel', 'dev-blog' ),
+		icon:  comment,
+		callback: ( { close } ) => {
+			dispatch( 'core/edit-post' ).toggleEditorPanelEnabled(
+				'discussion-panel'
+			);
+			close();
+		}
+	} );
+}
 
 // Toggles Button/Icon Labels in the site and post editors.
 dispatch( store ).registerCommand( {
@@ -49,20 +50,22 @@ dispatch( store ).registerCommand( {
 	icon:  button,
 	context: 'site-editor-edit',
 	callback: ( { close } ) => {
-		// Is there a way to contextually determine whether we are
-		// in the site or post editor?
-
+		
 		// Toggles preference for site editor.
-		dispatch( 'core/preferences' ).toggle(
-			'core/edit-site',
-			'showIconLabels'
-		);
+		if ( undefined !== wp.editSite ) {
+			dispatch( 'core/preferences' ).toggle(
+				'core/edit-site',
+				'showIconLabels'
+			);
+		}
 
 		// Toggles preference for post editor.
-		dispatch( 'core/preferences' ).toggle(
-			'core/edit-post',
-			'showIconLabels'
-		);
+		else if ( undefined !== wp.editPost ) {
+			dispatch( 'core/preferences' ).toggle(
+				'core/edit-post',
+				'showIconLabels'
+			);
+		}
 
 		close();
 	}

@@ -5,6 +5,7 @@ import { __ }       from '@wordpress/i18n';
 import { settings, search, comment, button } from '@wordpress/icons';
 
 // Adds a link to the Gutenberg Experiments screen in the admin.
+// Also shows using the `site-editor` context.
 dispatch( store ).registerCommand( {
 	name:  'dev-blog/gutenberg-experiments',
 	label: __( 'Gutenberg Experiments', 'dev-blog' ),
@@ -48,9 +49,8 @@ dispatch( store ).registerCommand( {
 	name:  'dev-blog/toggle-button-labels',
 	label: __( 'Toggle Button Labels', 'dev-blog' ),
 	icon:  button,
-	context: 'site-editor-edit',
 	callback: ( { close } ) => {
-		
+
 		// Toggles preference for site editor.
 		if ( undefined !== wp.editSite ) {
 			dispatch( 'core/preferences' ).toggle(

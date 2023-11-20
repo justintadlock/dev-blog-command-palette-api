@@ -1,8 +1,9 @@
 
-import { store }    from '@wordpress/commands';
-import { dispatch } from '@wordpress/data';
-import { __ }       from '@wordpress/i18n';
+import { store, useCommand } from '@wordpress/commands';
+import { dispatch, useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { settings, search, comment, button } from '@wordpress/icons';
+import { registerPlugin } from '@wordpress/plugins';
 
 // Adds a link to the Gutenberg Experiments screen in the admin.
 // Also shows using the `site-editor` context.
@@ -28,12 +29,52 @@ dispatch( store ).registerCommand( {
 	}
 } );
 
+// Toggles discussion panel in the core post editor.
+registerPlugin( 'dev-blog-command-palette', {
+	render: () => {
+		const discussionPanelEnabled = useSelect( ( select ) => {
+			return select( 'core/edit-post' ).isEditorPanelEnabled( 
+				'discussion-panel' 
+			);
+		}, [] );
+
+		const { toggleEditorPanelEnabled } = useDispatch( 'core/edit-post' );
+		const { createInfoNotice }         = useDispatch( 'core/notices'   );
+	
+		useCommand( {
+			name:  'dev-blog/discussion-show-hide',
+			label: discussionPanelEnabled
+			       ? __( 'Hide discussion panel', 'dev-blog' ) 
+			       : __( 'Show discussion panel', 'dev-blog' ),
+			icon:  comment,
+			callback: ( { close } ) => {
+				// Toggle the discussion panel.
+				toggleEditorPanelEnabled( 'discussion-panel' );
+				
+				// Add a snackbar notice.
+				createInfoNotice(
+					discussionPanelEnabled
+					? __( 'Discussion panel hidden.' )
+					: __( 'Discussion panel displayed.' ),
+					{
+						id:   'dev-blog/toggle-discussion/notice',
+						type: 'snackbar'
+					}
+				);
+	
+				close();
+			}
+		} );
+	}
+} );
+
+/*
 // Toggles Discussion panel in the post editor. Checks if we're editing a post 
 // via `wp.editPost` before registering the command.
 if ( undefined !== wp.editPost ) {
 	dispatch( store ).registerCommand( {
 		name:  'dev-blog/discussion-panel',
-		label: __( 'Toggle Discussion Panel', 'dev-blog' ),
+		label: __( 'Toggle discussion panel', 'dev-blog' ),
 		icon:  comment,
 		callback: ( { close } ) => {
 			dispatch( 'core/edit-post' ).toggleEditorPanelEnabled(
@@ -43,6 +84,7 @@ if ( undefined !== wp.editPost ) {
 		}
 	} );
 }
+/**/
 
 // Toggles Button/Icon Labels in the site and post editors.
 dispatch( store ).registerCommand( {

@@ -32,15 +32,18 @@ dispatch( store ).registerCommand( {
 // Toggles discussion panel in the core post editor.
 registerPlugin( 'dev-blog-command-palette', {
 	render: () => {
+		// Determine if the discussion panel is enabled.
 		const discussionPanelEnabled = useSelect( ( select ) => {
 			return select( 'core/edit-post' ).isEditorPanelEnabled( 
 				'discussion-panel' 
 			);
 		}, [] );
 
+		// Get functions for toggling panels and creating snackbars.
 		const { toggleEditorPanelEnabled } = useDispatch( 'core/edit-post' );
 		const { createInfoNotice }         = useDispatch( 'core/notices'   );
-	
+
+		// Register command to toggle discussion panel.
 		useCommand( {
 			name:  'dev-blog/discussion-show-hide',
 			label: discussionPanelEnabled
@@ -54,8 +57,8 @@ registerPlugin( 'dev-blog-command-palette', {
 				// Add a snackbar notice.
 				createInfoNotice(
 					discussionPanelEnabled
-					? __( 'Discussion panel hidden.' )
-					: __( 'Discussion panel displayed.' ),
+					? __( 'Discussion panel hidden.', 'dev-blog' )
+					: __( 'Discussion panel displayed.', 'dev-blog' ),
 					{
 						id:   'dev-blog/toggle-discussion/notice',
 						type: 'snackbar'
